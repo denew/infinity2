@@ -1,0 +1,32 @@
+const Map<String, String> stringsEs = {
+  'helpOverlayText':
+      "Arrastra y suelta (con varios dedos si eres realmente bueno), toca para rotar en el sentido de las agujas del reloj, toca dos veces para girar en sentido contrario. Toca el candado para acceder a más funciones.\n\nLos cuadrantes grises deben estar todos en los bordes.\n\nNo hay dos juegos iguales (bueno, no en tu vida al menos).\n\n¡Recurrir a 'Pista' o '¡Me rindo!' definitivamente te acercará a la solución, pero podría cambiar la orientación en la que estabas trabajando!",
+  'helpPara1':
+      "Arrastra y suelta (con varios dedos si eres muy bueno), toca para girar en el sentido de las agujas del reloj, toca dos veces para girar en sentido contrario.",
+  'helpPara2': "No hay dos juegos iguales (al menos no en tu vida)",
+  'helpBullet1':
+      "Toca el candado para acceder a más funciones: juegos más difíciles y cuadrículas hexagonales.",
+  'helpBullet2':
+      "Para las cuadrículas cuadradas, los cuadrantes grises deben estar todos en los bordes.",
+  'helpBullet3':
+      "Recurrir a 'Pista' o '¡Me rindo!' te llevará a una solución, ¡pero puede cambiar la orientación en la que estabas trabajando!",
+  'difficulty': 'Dificultad:',
+  'crazyToTry': '¡Estás loco por intentarlo!',
+  'hint': 'Pista',
+  'giveUp': '¡Me rindo!',
+  'showTimer': 'Mostrar temporizador',
+  'flatStyle': 'Estilo plano',
+  'displayMode': 'Modo de visualización',
+  'language': 'Idioma',
+  'help': 'Ayuda',
+  'resetPadlock': 'Restablecer candado (Depuración)',
+  'showSplashScreen': 'Mostrar pantalla inicial',
+  'puzzleSolvedGreatJob': '¡Rompecabezas resuelto! ¡Gran trabajo!',
+  'puzzleSolved': '¡Rompecabezas resuelto!',
+  'doNotShowAgain': 'No mostrar esto de nuevo',
+  'startGame': 'INICIAR JUEGO',
+  'thankYouForCoffee': '¡Gracias por el café! ☕️',
+  'purchaseFailed': 'Compra fallida o cancelada.',
+  'buyMeACoffee': '¿Me compras un café?',
+  'confirmTip': 'Confirmar Propina',
+};
