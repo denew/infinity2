@@ -1,4 +1,4 @@
-package com.denew.infinity2;
+package com.denew.indefinitely;
 
 import io.flutter.embedding.android.FlutterActivity;
 

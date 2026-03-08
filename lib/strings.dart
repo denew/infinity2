@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'models.dart';
 
 import 'i18n/strings_en.dart';
 import 'i18n/strings_zh.dart';
@@ -73,11 +74,25 @@ class AppStrings {
   static String get buyMeACoffee => _get('buyMeACoffee');
   static String get confirmTip => _get('confirmTip');
 
+  static String get progress => _get('progress');
+  static String get moves => _get('moves');
+  static String get hints => _get('hints');
+  static String get gameStateSaved => _get('gameStateSaved');
+
   static String _get(String key) {
     return _localizedStrings[currentLanguageCode]?[key] ??
         _localizedStrings['en']?[key] ??
         key;
   }
-}
 
-  static String getDisplayMode(DisplayMode mode) { switch (mode) { case DisplayMode.colours: return 'COLOR'; case DisplayMode.patterns: return 'PATTERNS'; case DisplayMode.numbers: return 'NUMBERS'; } }
+  static String getDisplayMode(DisplayMode mode) {
+    switch (mode) {
+      case DisplayMode.colours:
+        return _get('colorMode');
+      case DisplayMode.patterns:
+        return _get('patternsMode');
+      case DisplayMode.numbers:
+        return _get('numbersMode');
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,7 +54,6 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     _showSplash = true;
     _initSplashPatterns();
     _loadPrefs();
-    _initGame();
   }
 
   @override
@@ -103,11 +103,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     String? savedSize = prefs.getString('boardSizeStr');
     if (savedSize != null) {
-      _applyBoardSize(savedSize, initGame: true);
+      _applyBoardSize(savedSize, initGame: true, loadState: true);
+    } else {
+      _initGame();
     }
   }
 
-  void _applyBoardSize(String sizeStr, {bool initGame = false}) {
+  void _applyBoardSize(String sizeStr,
+      {bool initGame = false, bool loadState = false}) {
     List<String> parts;
     int val1 = 4, val2 = 4;
 
@@ -173,9 +176,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (initGame) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          setState(() {
-            _initGame();
-          });
+          _initGame(loadState: loadState);
         }
       });
     }
@@ -227,15 +228,25 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     }
   }
 
-  void _initGame() {
+  void _initGame({bool loadState = false}) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       if (_isHexMode && hexEngine != null) {
         hexEngine!.initGame();
+        if (loadState) {
+          String? s = prefs.getString('saved_hex_state');
+          if (s != null) hexEngine!.importState(s);
+        }
       } else {
         engine.initGame();
+        if (loadState) {
+          String? s = prefs.getString('saved_square_state');
+          if (s != null) engine.importState(s);
+        }
       }
       draggedIndex = null;
-      _secondsElapsed = 0;
+      _secondsElapsed = loadState ? (prefs.getInt('saved_time') ?? 0) : 0;
       isSolving = false;
       if (_showTimer) {
         _startTimer();
@@ -299,7 +310,6 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         });
       }
     } else {
-      hexEngine!.hintCount++;
       engine.hintCount++;
       int currentIdx = engine.grid.indexWhere((p) => p.id == missingPieceId);
 
@@ -523,6 +533,27 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     }
   }
 
+  void _saveGame() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('saved_moves',
+        _isHexMode ? (hexEngine?.moveCount ?? 0) : engine.moveCount);
+    await prefs.setInt('saved_hints',
+        _isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount);
+    await prefs.setInt('saved_time', _secondsElapsed);
+
+    if (_isHexMode && hexEngine != null) {
+      await prefs.setString('saved_hex_state', hexEngine!.exportState());
+    } else {
+      await prefs.setString('saved_square_state', engine.exportState());
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.gameStateSaved)),
+      );
+    }
+  }
+
   void _showUnlockDialog() async {
     final success = await showDialog<bool>(
       context: context,
@@ -583,17 +614,17 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                   ),
                 ),
               ),
-              if (!_isUnlocked)
-                IconButton(
-                  icon: const Icon(_isUnlocked ? Icons.save : Icons.lock, color: Colors.amber),
-                  onPressed: _showUnlockDialog,
-                ),
+              IconButton(
+                icon: Icon(_isUnlocked ? Icons.save : Icons.lock,
+                    color: Colors.amber),
+                onPressed: _isUnlocked ? _saveGame : _showUnlockDialog,
+              ),
             ],
           ),
           Text(
               _showTimer
-                  ? 'Progress: ${_isHexMode ? ((hexEngine?.moveCount ?? 0)}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} : engine.moveCount}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} / ${(_secondsElapsed ~/ 60).toString().padLeft(2, '0')}:${(_secondsElapsed % 60).toString().padLeft(2, "0")}'
-                  : 'Moves: ${_isHexMode ? ((hexEngine?.moveCount ?? 0)}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} : engine.moveCount}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount}',
+                  ? '${AppStrings.progress}: ${_isHexMode ? (hexEngine?.moveCount ?? 0) : engine.moveCount}, ${AppStrings.hints}: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} / ${(_secondsElapsed ~/ 60).toString().padLeft(2, '0')}:${(_secondsElapsed % 60).toString().padLeft(2, "0")}'
+                  : '${AppStrings.moves}: ${_isHexMode ? (hexEngine?.moveCount ?? 0) : engine.moveCount}, ${AppStrings.hints}: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount}',
               style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.amber,
@@ -647,11 +678,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                   ),
                 IconButton(
                   icon: const Icon(Icons.refresh),
-                  onPressed: isSolving
-                      ? null
-                      : () => setState(() {
-                            _initGame();
-                          }),
+                  onPressed: isSolving ? null : () => _initGame(),
                 )
               ],
             ),
@@ -706,8 +733,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       items: DisplayMode.values.map((DisplayMode value) {
                         return DropdownMenuItem<DisplayMode>(
                           value: value,
-                          child: Text(
-                              AppStrings.getDisplayMode(value)),
+                          child: Text(AppStrings.getDisplayMode(value)),
                         );
                       }).toList(),
                       onChanged: (DisplayMode? newValue) {
@@ -743,6 +769,19 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                     ),
                   ),
                   ListTile(
+                    leading: const Icon(Icons.lock_open),
+                    title: Text(AppStrings.resetPadlock),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('isUnlocked', false);
+                      setState(() {
+                        _isUnlocked = false;
+                        _sliderValue = 2.0;
+                      });
+                    },
+                  ),
+                  ListTile(
                     leading: const Icon(Icons.info_outline),
                     title: Text(AppStrings.help),
                     onTap: () {
@@ -760,6 +799,13 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       setState(() {
                         _showSplash = true;
                       });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.exit_to_app),
+                    title: const Text('Exit Game'),
+                    onTap: () {
+                      SystemNavigator.pop();
                     },
                   ),
                 ],
@@ -1132,7 +1178,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                     children: [
               Text('Indefinitely',
                   style: GoogleFonts.secularOne(
-                      fontSize: 48,
+                      fontSize: 44,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       letterSpacing: 2)),
@@ -1143,69 +1189,137 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       fontStyle: FontStyle.italic,
                       color: Colors.grey)),
               const SizedBox(height: 60),
-              Transform(
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.002)
-                  ..rotateX(-math.pi / 3.54)
-                  ..rotateZ(-math.pi / 4),
+              Stack(
                 alignment: Alignment.center,
-                child: SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: Center(
-                    child: SizedBox(
-                      width: 154,
-                      height: 154,
-                      child: GridView.builder(
-                          padding: const EdgeInsets.only(bottom: 4, right: 4),
-                          clipBehavior: Clip.none,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 2,
-                                  mainAxisSpacing: 2),
-                          itemCount: 9,
-                          itemBuilder: (context, index) {
-                            var patterns = _splashPatterns[index];
-                            return Container(
-                              decoration: BoxDecoration(boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black.withOpacity(0.5),
-                                    blurRadius: 4,
-                                    offset: const Offset(2, 2))
-                              ]),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  CustomPaint(
-                                    painter: PiecePainter(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    top: 60,
+                    right: 40,
+                    child: Transform(
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.002)
+                        ..rotateX(-math.pi / 3.54)
+                        ..rotateZ(-math.pi / 4),
+                      alignment: Alignment.center,
+                      child: Opacity(
+                        opacity: 0.6,
+                        child: SizedBox(
+                          width: 154,
+                          height: 154,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: List.generate(9, (index) {
+                              int col = index % 3;
+                              int row = index ~/ 3;
+                              double hexW = 154 / 3;
+                              double hexH = hexW * math.sqrt(3) / 2;
+                              double left = col * hexW * 0.75;
+                              double top =
+                                  row * hexH + (col % 2 == 1 ? hexH / 2 : 0);
+                              var patterns = _splashPatterns[index];
+                              var edges = [
+                                patterns[0],
+                                patterns[1],
+                                patterns[2],
+                                patterns[3],
+                                patterns[0],
+                                patterns[1]
+                              ];
+                              return Positioned(
+                                left: left,
+                                top: top,
+                                width: hexW,
+                                height: hexH,
+                                child: Container(
+                                  decoration: BoxDecoration(boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        blurRadius: 4,
+                                        offset: const Offset(2, 2))
+                                  ]),
+                                  child: CustomPaint(
+                                    painter: HexPiecePainter(
                                       mode: DisplayMode.colours,
                                       isFlat: _isFlatMode,
                                       pieceTurns: 0,
-                                      topData: patterns[0],
-                                      rightData: patterns[1],
-                                      bottomData: patterns[2],
-                                      leftData: patterns[3],
+                                      edgeData: edges,
                                     ),
                                   ),
-                                  CustomPaint(
-                                    painter: OverlayPainter(
-                                      mode: DisplayMode.colours,
-                                      isFlat: _isFlatMode,
-                                      topData: patterns[0],
-                                      rightData: patterns[1],
-                                      bottomData: patterns[2],
-                                      leftData: patterns[3],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Transform(
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.002)
+                      ..rotateX(-math.pi / 3.54)
+                      ..rotateZ(-math.pi / 4),
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Center(
+                        child: SizedBox(
+                          width: 154,
+                          height: 154,
+                          child: GridView.builder(
+                              padding:
+                                  const EdgeInsets.only(bottom: 4, right: 4),
+                              clipBehavior: Clip.none,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 2,
+                                      mainAxisSpacing: 2),
+                              itemCount: 9,
+                              itemBuilder: (context, index) {
+                                var patterns = _splashPatterns[index];
+                                return Container(
+                                  decoration: BoxDecoration(boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        blurRadius: 4,
+                                        offset: const Offset(2, 2))
+                                  ]),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      CustomPaint(
+                                        painter: PiecePainter(
+                                          mode: DisplayMode.colours,
+                                          isFlat: _isFlatMode,
+                                          pieceTurns: 0,
+                                          topData: patterns[0],
+                                          rightData: patterns[1],
+                                          bottomData: patterns[2],
+                                          leftData: patterns[3],
+                                        ),
+                                      ),
+                                      CustomPaint(
+                                        painter: OverlayPainter(
+                                          mode: DisplayMode.colours,
+                                          isFlat: _isFlatMode,
+                                          topData: patterns[0],
+                                          rightData: patterns[1],
+                                          bottomData: patterns[2],
+                                          leftData: patterns[3],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 80),
               Row(

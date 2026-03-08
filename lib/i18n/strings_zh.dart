@@ -25,4 +25,11 @@ const Map<String, String> stringsZh = {
   'purchaseFailed': '购买失败或被取消。',
   'buyMeACoffee': '给我买杯咖啡？',
   'confirmTip': '确认打赏',
+  'colorMode': '颜色',
+  'patternsMode': '图案',
+  'numbersMode': '数字',
+  'progress': '进度',
+  'moves': '步数',
+  'hints': '提示',
+  'gameStateSaved': '游戏状态已保存！',
 };

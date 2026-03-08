@@ -21,4 +21,16 @@ class HexPieceData {
   void rotateAntiClockwise() {
     turns--;
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'baseEdges': baseEdges,
+        'turns': turns,
+      };
+
+  factory HexPieceData.fromJson(Map<String, dynamic> json) {
+    var p = HexPieceData(json['id'], List<int>.from(json['baseEdges']));
+    p.turns = json['turns'];
+    return p;
+  }
 }

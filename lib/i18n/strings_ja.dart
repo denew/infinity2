@@ -25,4 +25,11 @@ const Map<String, String> stringsJa = {
   'purchaseFailed': '購入が失敗またはキャンセルされました。',
   'buyMeACoffee': 'コーヒーをおごる？',
   'confirmTip': 'チップを確認',
+  'colorMode': '色',
+  'patternsMode': 'パターン',
+  'numbersMode': '数字',
+  'progress': '進行',
+  'moves': '手数',
+  'hints': 'ヒント',
+  'gameStateSaved': 'ゲームの状態が保存されました！',
 };

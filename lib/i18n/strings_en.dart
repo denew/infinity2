@@ -28,4 +28,11 @@ const Map<String, String> stringsEn = {
   'purchaseFailed': 'Purchase failed or cancelled.',
   'buyMeACoffee': 'Buy me a coffee?',
   'confirmTip': 'Confirm Tip',
+  'colorMode': 'COLOR',
+  'patternsMode': 'PATTERNS',
+  'numbersMode': 'NUMBERS',
+  'progress': 'Progress',
+  'moves': 'Moves',
+  'hints': 'Hints',
+  'gameStateSaved': 'Game state saved!',
 };

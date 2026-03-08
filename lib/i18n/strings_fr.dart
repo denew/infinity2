@@ -29,4 +29,11 @@ const Map<String, String> stringsFr = {
   'purchaseFailed': 'Achat échoué ou annulé.',
   'buyMeACoffee': 'M\'offrir un café ?',
   'confirmTip': 'Confirmer le don',
+  'colorMode': 'COULEUR',
+  'patternsMode': 'MOTIFS',
+  'numbersMode': 'NOMBRES',
+  'progress': 'Progrès',
+  'moves': 'Coups',
+  'hints': 'Indices',
+  'gameStateSaved': 'État du jeu sauvegardé !',
 };

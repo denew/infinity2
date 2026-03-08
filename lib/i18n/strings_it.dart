@@ -29,4 +29,11 @@ const Map<String, String> stringsIt = {
   'purchaseFailed': 'Acquisto fallito o annullato.',
   'buyMeACoffee': 'Comprami un caffè?',
   'confirmTip': 'Conferma Mancia',
+  'colorMode': 'COLORE',
+  'patternsMode': 'MODELLI',
+  'numbersMode': 'NUMERI',
+  'progress': 'Progresso',
+  'moves': 'Mosse',
+  'hints': 'Suggerimenti',
+  'gameStateSaved': 'Stato del gioco salvato!',
 };

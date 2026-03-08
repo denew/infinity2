@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'models.dart';
 import 'colours.dart';
 
@@ -99,5 +100,32 @@ class GameEngine {
     }
 
     return true;
+  }
+
+  String exportState() {
+    return jsonEncode({
+      'cols': cols,
+      'rows': rows,
+      'moveCount': moveCount,
+      'hintCount': hintCount,
+      'usedGiveUp': usedGiveUp,
+      'grid': grid.map((p) => p.toJson()).toList(),
+      'patterns': patterns.map((k, v) => MapEntry(k.toString(), v.toJson())),
+    });
+  }
+
+  void importState(String jsonStr) {
+    var data = jsonDecode(jsonStr);
+    if (data['cols'] != cols || data['rows'] != rows) return;
+    moveCount = data['moveCount'];
+    hintCount = data['hintCount'];
+    usedGiveUp = data['usedGiveUp'];
+
+    grid = (data['grid'] as List).map((p) => PieceData.fromJson(p)).toList();
+
+    patterns.clear();
+    (data['patterns'] as Map<String, dynamic>).forEach((k, v) {
+      patterns[int.parse(k)] = PatternData.fromJson(v);
+    });
   }
 }

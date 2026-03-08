@@ -65,6 +65,22 @@ class PieceData {
   void rotateAntiClockwise() {
     turns--;
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'baseTop': baseTop,
+        'baseRight': baseRight,
+        'baseBottom': baseBottom,
+        'baseLeft': baseLeft,
+        'turns': turns,
+      };
+
+  factory PieceData.fromJson(Map<String, dynamic> json) {
+    var p = PieceData(json['id'], json['baseTop'], json['baseRight'],
+        json['baseBottom'], json['baseLeft']);
+    p.turns = json['turns'];
+    return p;
+  }
 }
 
 class PatternData {
@@ -74,6 +90,22 @@ class PatternData {
   final int number;
 
   PatternData(this.bgColor, this.fgColor, this.shape, this.number);
+
+  Map<String, dynamic> toJson() => {
+        'bgColor': bgColor.value,
+        'fgColor': fgColor.value,
+        'shape': shape,
+        'number': number,
+      };
+
+  factory PatternData.fromJson(Map<String, dynamic> json) {
+    return PatternData(
+      Color(json['bgColor']),
+      Color(json['fgColor']),
+      json['shape'],
+      json['number'],
+    );
+  }
 }
 
 enum DisplayMode { colours, patterns, numbers }
