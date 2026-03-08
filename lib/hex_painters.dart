@@ -54,8 +54,21 @@ class HexPiecePainter extends CustomPainter {
           ..lineTo(-r, 0)
           ..close();
         canvas.drawPath(diamond, fgPaint);
+      } else if (data.shape == 3) {
+        Paint linePaint = Paint()
+          ..color = data.fgColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3.0;
+        canvas.drawLine(Offset(-r, -r), Offset(r, r), linePaint);
+        canvas.drawLine(Offset(-r, r), Offset(r, -r), linePaint);
+      } else if (data.shape == 4) {
+        Path triangle = Path()
+          ..moveTo(0, -r)
+          ..lineTo(r * 0.866, r * 0.5)
+          ..lineTo(-r * 0.866, r * 0.5)
+          ..close();
+        canvas.drawPath(triangle, fgPaint);
       }
-      // other shapes can be omitted for hex if not needed, as user said patterns might drop, but lets keep it basic
     }
 
     canvas.restore();

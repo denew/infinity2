@@ -11,16 +11,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppStrings.init();
   await paymentService.initialize(); // Init billing client
-  runApp(const InfinityPuzzleApp());
+  runApp(const IndefinitelyApp());
 }
 
-class InfinityPuzzleApp extends StatelessWidget {
-  const InfinityPuzzleApp({Key? key}) : super(key: key);
+class IndefinitelyApp extends StatelessWidget {
+  const IndefinitelyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Infinity II',
+      title: 'Indefinitely',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF1E1E2C),
       ),

@@ -45,7 +45,14 @@ class _TipDialogState extends State<TipDialog> {
         // Show success and close dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppStrings.thankYouForCoffee),
+            content: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(AppStrings.thankYouForCoffee),
+                const SizedBox(width: 4),
+                const Icon(Icons.local_cafe, size: 14, color: Colors.white),
+              ],
+            ),
             backgroundColor: Colors.green,
           ),
         );

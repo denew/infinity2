@@ -10,7 +10,7 @@ const Map<String, String> stringsEn = {
   'helpBullet3':
       "Resorting to 'Hint' or 'I give up!' will definitely progress to a solution, but may change the orientation you were working on!",
   'difficulty': 'Difficulty:',
-  'crazyToTry': 'You\'re crazy to try it!',
+  'crazyToTry': 'You could be here for a while...',
   'hint': 'Hint',
   'giveUp': 'I give up!',
   'showTimer': 'Show Timer',
@@ -24,7 +24,7 @@ const Map<String, String> stringsEn = {
   'puzzleSolved': 'Puzzle Solved!',
   'doNotShowAgain': 'Do not show this again',
   'startGame': 'START GAME',
-  'thankYouForCoffee': 'Thank you for the coffee! ☕️',
+  'thankYouForCoffee': 'Thank you for the coffee!',
   'purchaseFailed': 'Purchase failed or cancelled.',
   'buyMeACoffee': 'Buy me a coffee?',
   'confirmTip': 'Confirm Tip',

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class HexPieceData {
   final int id;
   // 0: Top, 1: TopRight, 2: BottomRight, 3: Bottom, 4: BottomLeft, 5: TopLeft

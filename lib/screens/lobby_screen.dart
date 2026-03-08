@@ -6,7 +6,7 @@ class LobbyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Infinity II - Lobby')),
+      appBar: AppBar(title: const Text('Indefinitely - Lobby')),
       body: const Center(
         child: Text('Lobby Screen placeholder'),
       ),

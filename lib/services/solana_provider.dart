@@ -4,10 +4,10 @@ class SolanaProvider implements PaymentProvider {
   // A variable range, for example, minimum 1 unit to a maximum of 100
   // This provides a "continuous" feel for crypto payments.
   @override
-  int get minNotch => 1;
+  int get minNotch => 50;
 
   @override
-  int get maxNotch => 100;
+  int get maxNotch => 250;
 
   // E.g., SKR or SOL. For fine-grained decimal control,
   // your formula in getFormattedPriceForNotch will reflect decimals.
@@ -22,17 +22,13 @@ class SolanaProvider implements PaymentProvider {
 
   @override
   Future<String> getFormattedPriceForNotch(int notch) async {
-    // A linear calculation based on the notch position
-    // E.g. we might map notch 1..100 to 0.1 to 10.0 SKR
-    final skrAmount = notch * 0.1;
-    return '${skrAmount.toStringAsFixed(1)} $_tokenSymbol';
+    return '$notch $_tokenSymbol';
   }
 
   @override
   Future<bool> purchase(int notch) async {
-    final skrAmount = notch * 0.1;
     print(
-        'Initiating Solana transaction for: $skrAmount $_tokenSymbol (Notch: $notch)');
+        'Initiating Solana transaction for: $notch $_tokenSymbol (Notch: $notch)');
 
     // TODO: Build and send SPL token transfer transaction
     // 1. Convert amount to lowest denominator (e.g. lamports if SOL)

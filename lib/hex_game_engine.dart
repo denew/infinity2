@@ -10,6 +10,7 @@ class HexGameEngine {
   List<HexPieceData> grid = [];
   Map<int, PatternData> patterns = {};
   int moveCount = 0;
+  int hintCount = 0;
   bool usedGiveUp = false;
 
   HexGameEngine(this.cols, this.rows);
@@ -18,6 +19,7 @@ class HexGameEngine {
     grid.clear();
     patterns.clear();
     moveCount = 0;
+    hintCount = 0;
     usedGiveUp = false;
 
     patterns[0] = PatternData(neutralColour(), neutralColour(), 0, 0);

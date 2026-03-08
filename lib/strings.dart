@@ -79,3 +79,5 @@ class AppStrings {
         key;
   }
 }
+
+  static String getDisplayMode(DisplayMode mode) { switch (mode) { case DisplayMode.colours: return 'COLOR'; case DisplayMode.patterns: return 'PATTERNS'; case DisplayMode.numbers: return 'NUMBERS'; } }

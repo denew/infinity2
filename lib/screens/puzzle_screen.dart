@@ -273,6 +273,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     });
 
     if (_isHexMode && hexEngine != null) {
+      hexEngine!.hintCount++;
       int currentIdx =
           hexEngine!.grid.indexWhere((p) => p.id == missingPieceId);
       if (currentIdx != missingPieceId) {
@@ -298,6 +299,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         });
       }
     } else {
+      hexEngine!.hintCount++;
+      engine.hintCount++;
       int currentIdx = engine.grid.indexWhere((p) => p.id == missingPieceId);
 
       if (currentIdx != missingPieceId) {
@@ -582,15 +585,15 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               ),
               if (!_isUnlocked)
                 IconButton(
-                  icon: const Icon(Icons.lock, color: Colors.amber),
+                  icon: const Icon(_isUnlocked ? Icons.save : Icons.lock, color: Colors.amber),
                   onPressed: _showUnlockDialog,
                 ),
             ],
           ),
           Text(
               _showTimer
-                  ? 'Progress: ${_isHexMode ? (hexEngine?.moveCount ?? 0) : engine.moveCount} / ${(_secondsElapsed ~/ 60).toString().padLeft(2, '0')}:${(_secondsElapsed % 60).toString().padLeft(2, "0")}'
-                  : 'Moves: ${_isHexMode ? (hexEngine?.moveCount ?? 0) : engine.moveCount}',
+                  ? 'Progress: ${_isHexMode ? ((hexEngine?.moveCount ?? 0)}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} : engine.moveCount}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} / ${(_secondsElapsed ~/ 60).toString().padLeft(2, '0')}:${(_secondsElapsed % 60).toString().padLeft(2, "0")}'
+                  : 'Moves: ${_isHexMode ? ((hexEngine?.moveCount ?? 0)}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount} : engine.moveCount}, Hints: ${_isHexMode ? (hexEngine?.hintCount ?? 0) : engine.hintCount}',
               style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.amber,
@@ -616,7 +619,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Infinity II',
+                  Text('Indefinitely',
                       style: GoogleFonts.secularOne(fontSize: 22)),
                   Text(AppStrings.crazyToTry,
                       style: const TextStyle(
@@ -660,7 +663,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                 children: [
                   const DrawerHeader(
                     decoration: BoxDecoration(color: Color(0xFF1E1E2C)),
-                    child: Text('Infinity II',
+                    child: Text('Indefinitely',
                         style: TextStyle(color: Colors.white, fontSize: 24)),
                   ),
                   ListTile(
@@ -704,7 +707,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                         return DropdownMenuItem<DisplayMode>(
                           value: value,
                           child: Text(
-                              value.toString().split('.').last.toUpperCase()),
+                              AppStrings.getDisplayMode(value)),
                         );
                       }).toList(),
                       onChanged: (DisplayMode? newValue) {
@@ -1127,7 +1130,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-              Text('Infinity II',
+              Text('Indefinitely',
                   style: GoogleFonts.secularOne(
                       fontSize: 48,
                       fontWeight: FontWeight.normal,
