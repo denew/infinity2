@@ -661,7 +661,21 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
           int newIdx = newR * engine.cols + newC;
           PieceData oldP = engine.grid[oldIdx];
-          PieceData newP = PieceData(newIdx, oldP.baseTop, oldP.baseRight,
+          
+          int targetOldR = oldP.id ~/ oldCols;
+          int targetOldC = oldP.id % oldCols;
+          int targetNewR, targetNewC;
+          
+          if (toPortrait) {
+            targetNewR = targetOldC;
+            targetNewC = oldRows - 1 - targetOldR;
+          } else {
+            targetNewR = oldCols - 1 - targetOldC;
+            targetNewC = targetOldR;
+          }
+          int newTargetId = targetNewR * engine.cols + targetNewC;
+
+          PieceData newP = PieceData(newTargetId, oldP.baseTop, oldP.baseRight,
               oldP.baseBottom, oldP.baseLeft);
           newP.turns = oldP.turns;
 
