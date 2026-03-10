@@ -21,7 +21,7 @@ const Map<String, String> stringsZh = {
   'puzzleSolved': '拼图已解决！',
   'doNotShowAgain': '不再显示',
   'startGame': '开始游戏',
-  'thankYouForCoffee': '谢谢您的咖啡！☕️',
+  'thankYouForCoffee': '谢谢您的咖啡！',
   'purchaseFailed': '购买失败或被取消。',
   'buyMeACoffee': '给我买杯咖啡？',
   'confirmTip': '确认打赏',
@@ -32,4 +32,5 @@ const Map<String, String> stringsZh = {
   'moves': '步数',
   'hints': '提示',
   'gameStateSaved': '游戏状态已保存！',
+  'exitPuzzle': '退出拼图',
 };

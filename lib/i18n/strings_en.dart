@@ -35,4 +35,5 @@ const Map<String, String> stringsEn = {
   'moves': 'Moves',
   'hints': 'Hints',
   'gameStateSaved': 'Game state saved!',
+  'exitPuzzle': 'Exit Puzzle',
 };

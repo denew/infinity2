@@ -634,8 +634,63 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     );
   }
 
+  void _rotatePuzzleBoard(bool toPortrait) {
+    if (!mounted) return;
+    setState(() {
+      int oldCols = engine.cols;
+      int oldRows = engine.rows;
+      engine.cols = oldRows;
+      engine.rows = oldCols;
+      cols = engine.cols;
+      rows = engine.rows;
+
+      List<PieceData> newGrid =
+          List.filled(oldCols * oldRows, PieceData(0, 0, 0, 0, 0));
+      for (int r = 0; r < oldRows; r++) {
+        for (int c = 0; c < oldCols; c++) {
+          int oldIdx = r * oldCols + c;
+          int newR, newC;
+
+          if (toPortrait) {
+            newR = c;
+            newC = oldRows - 1 - r;
+          } else {
+            newR = oldCols - 1 - c;
+            newC = r;
+          }
+
+          int newIdx = newR * engine.cols + newC;
+          PieceData oldP = engine.grid[oldIdx];
+          PieceData newP = PieceData(newIdx, oldP.baseTop, oldP.baseRight,
+              oldP.baseBottom, oldP.baseLeft);
+          newP.turns = oldP.turns;
+
+          if (toPortrait) {
+            newP.rotate();
+          } else {
+            newP.rotateAntiClockwise();
+          }
+          newGrid[newIdx] = newP;
+        }
+      }
+      engine.grid = newGrid;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool isPortrait =
+        MediaQuery.of(context).size.height > MediaQuery.of(context).size.width;
+
+    if (!_isHexMode && engine.grid.isNotEmpty && engine.cols != engine.rows) {
+      bool engineIsPortrait = engine.rows > engine.cols;
+      if (isPortrait != engineIsPortrait) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _rotatePuzzleBoard(isPortrait);
+        });
+      }
+    }
+
     bool solved =
         _isHexMode ? (hexEngine?.isSolved() ?? false) : engine.isSolved();
     double screenWidth = MediaQuery.of(context).size.width - 32;
@@ -644,7 +699,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      appBar: _showSplash
+      appBar: (_showSplash || !isPortrait)
           ? null
           : AppBar(
               title: Column(
@@ -803,7 +858,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.exit_to_app),
-                    title: const Text('Exit Game'),
+                    title: Text(AppStrings.exitPuzzle),
                     onTap: () {
                       SystemNavigator.pop();
                     },
@@ -813,31 +868,137 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             ),
       body: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+          if (isPortrait)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildControls(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Opacity(
+                      opacity: solved ? 1.0 : 0.0,
+                      child: Text(
+                          (_isHexMode
+                                  ? (hexEngine?.usedGiveUp ?? false)
+                                  : engine.usedGiveUp)
+                              ? AppStrings.puzzleSolved
+                              : AppStrings.puzzleSolvedGreatJob,
+                          style: const TextStyle(
+                              color: Colors.greenAccent,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  _buildGameGrid(screenWidth, screenHeight),
+                ],
+              ),
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildControls(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Opacity(
-                    opacity: solved ? 1.0 : 0.0,
-                    child: Text(
-                        (_isHexMode
-                                ? (hexEngine?.usedGiveUp ?? false)
-                                : engine.usedGiveUp)
-                            ? AppStrings.puzzleSolved
-                            : AppStrings.puzzleSolvedGreatJob,
-                        style: const TextStyle(
-                            color: Colors.greenAccent,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold)),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.35,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Builder(
+                          builder: (context) => Padding(
+                            padding: const EdgeInsets.only(
+                                top: 16.0, left: 16.0, right: 8.0, bottom: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  alignment: Alignment.topLeft,
+                                  icon: const Icon(Icons.menu),
+                                  onPressed: () =>
+                                      Scaffold.of(context).openDrawer(),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Indefinitely',
+                                          style: GoogleFonts.secularOne(
+                                              fontSize: 22)),
+                                      Text(AppStrings.crazyToTry,
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontStyle: FontStyle.italic)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (!solved)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: isSolving ? null : _hint,
+                                  child: Text(AppStrings.hint,
+                                      style: const TextStyle(
+                                          color: Colors.yellowAccent,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                TextButton(
+                                  onPressed: isSolving ? null : _giveUp,
+                                  child: Text(AppStrings.giveUp,
+                                      style: const TextStyle(
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.refresh),
+                                  onPressed:
+                                      isSolving ? null : () => _initGame(),
+                                )
+                              ],
+                            ),
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: IconButton(
+                              icon: const Icon(Icons.refresh),
+                              onPressed: isSolving ? null : () => _initGame(),
+                            ),
+                          ),
+                        _buildControls(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Opacity(
+                            opacity: solved ? 1.0 : 0.0,
+                            child: Text(
+                                (_isHexMode
+                                        ? (hexEngine?.usedGiveUp ?? false)
+                                        : engine.usedGiveUp)
+                                    ? AppStrings.puzzleSolved
+                                    : AppStrings.puzzleSolvedGreatJob,
+                                style: const TextStyle(
+                                    color: Colors.greenAccent,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                _buildGameGrid(screenWidth, screenHeight),
+                _buildGameGrid(MediaQuery.of(context).size.width * 0.65 - 16,
+                    MediaQuery.of(context).size.height - 16),
               ],
             ),
-          ),
           if (_showHelpInfo && !_showSplash) _buildHelpOverlay(),
           if (_showSplash) _buildSplashScreen(),
         ],
@@ -847,8 +1008,23 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
   Widget _buildGameGrid(double screenWidth, double screenHeight) {
     if (_isHexMode && hexEngine != null) {
-      double pieceSizeW = screenWidth / ((cols - 1) * 0.75 + 1.0);
-      double pieceSizeH = screenHeight / ((rows + 0.5) * math.sqrt(3) / 2);
+      bool isPortrait = MediaQuery.of(context).size.height >
+          MediaQuery.of(context).size.width;
+      bool engineIsPortrait = hexEngine!.rows > hexEngine!.cols;
+
+      bool needsRotation = false;
+      int qTurns = 0;
+      if (hexEngine!.cols != hexEngine!.rows &&
+          isPortrait != engineIsPortrait) {
+        needsRotation = true;
+        qTurns = !isPortrait ? 3 : 1;
+      }
+
+      double tempW = needsRotation ? screenHeight : screenWidth;
+      double tempH = needsRotation ? screenWidth : screenHeight;
+
+      double pieceSizeW = tempW / ((cols - 1) * 0.75 + 1.0);
+      double pieceSizeH = tempH / ((rows + 0.5) * math.sqrt(3) / 2);
       double pieceSize = math.min(pieceSizeW, pieceSizeH);
       if (pieceSize <= 0) pieceSize = 50.0;
       double hexW = pieceSize;
@@ -857,116 +1033,121 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       double boardWidth = ((cols - 1) * 0.75 + 1.0) * hexW;
       double boardHeight = (rows + 0.5) * hexH;
 
+      Widget board = SizedBox(
+        width: boardWidth,
+        height: boardHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: hexEngine!.grid.asMap().entries.map((entry) {
+            int idx = entry.key;
+            HexPieceData piece = entry.value;
+
+            int col = idx % cols;
+            int row = idx ~/ cols;
+
+            double left = col * hexW * 0.75;
+            double top = row * hexH + (col % 2 == 1 ? hexH / 2 : 0);
+
+            Widget pieceWidget = GestureDetector(
+              onTap: isSolving
+                  ? null
+                  : () {
+                      setState(() {
+                        piece.rotate();
+                        hexEngine!.moveCount++;
+                      });
+                    },
+              onDoubleTap: isSolving
+                  ? null
+                  : () {
+                      setState(() {
+                        piece.rotateAntiClockwise();
+                        hexEngine!.moveCount++;
+                      });
+                    },
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  AnimatedRotation(
+                    turns: piece.turns / 6.0,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    child: CustomPaint(
+                      size: Size(hexW - 2, hexH - 2),
+                      painter: HexPiecePainter(
+                        mode: _displayMode,
+                        isFlat: _isFlatMode,
+                        pieceTurns: piece.turns,
+                        edgeData: [
+                          hexEngine!.patterns[piece.baseEdges[0]]!,
+                          hexEngine!.patterns[piece.baseEdges[1]]!,
+                          hexEngine!.patterns[piece.baseEdges[2]]!,
+                          hexEngine!.patterns[piece.baseEdges[3]]!,
+                          hexEngine!.patterns[piece.baseEdges[4]]!,
+                          hexEngine!.patterns[piece.baseEdges[5]]!,
+                        ],
+                      ),
+                    ),
+                  ),
+                  CustomPaint(
+                    size: Size(hexW - 2, hexH - 2),
+                    painter: HexOverlayPainter(
+                      mode: _displayMode,
+                      isFlat: _isFlatMode,
+                      rotationTurns: qTurns,
+                      edgeData: [
+                        hexEngine!.patterns[piece.getEdge(0)]!,
+                        hexEngine!.patterns[piece.getEdge(1)]!,
+                        hexEngine!.patterns[piece.getEdge(2)]!,
+                        hexEngine!.patterns[piece.getEdge(3)]!,
+                        hexEngine!.patterns[piece.getEdge(4)]!,
+                        hexEngine!.patterns[piece.getEdge(5)]!,
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+            return AnimatedPositioned(
+              key: ValueKey(piece.id),
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              left: left,
+              top: top,
+              width: hexW,
+              height: hexH,
+              child: DragTarget<int>(
+                onWillAccept: (src) {
+                  return src != idx;
+                },
+                onAccept: (sourceIdx) {
+                  _swapPieces(sourceIdx, idx);
+                },
+                builder: (context, candidateData, rejectedData) {
+                  return Draggable<int>(
+                    data: idx,
+                    maxSimultaneousDrags: isSolving ? 0 : 1,
+                    childWhenDragging:
+                        Opacity(opacity: 0.3, child: pieceWidget),
+                    feedback: Material(
+                        color: Colors.transparent,
+                        child: SizedBox(
+                            width: hexW, height: hexH, child: pieceWidget)),
+                    child: pieceWidget,
+                  );
+                },
+              ),
+            );
+          }).toList(),
+        ),
+      );
+
       return Expanded(
         child: Center(
-          child: SizedBox(
-            width: boardWidth,
-            height: boardHeight,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: hexEngine!.grid.asMap().entries.map((entry) {
-                int idx = entry.key;
-                HexPieceData piece = entry.value;
-
-                int col = idx % cols;
-                int row = idx ~/ cols;
-
-                double left = col * hexW * 0.75;
-                double top = row * hexH + (col % 2 == 1 ? hexH / 2 : 0);
-
-                Widget pieceWidget = GestureDetector(
-                  onTap: isSolving
-                      ? null
-                      : () {
-                          setState(() {
-                            piece.rotate();
-                            hexEngine!.moveCount++;
-                          });
-                        },
-                  onDoubleTap: isSolving
-                      ? null
-                      : () {
-                          setState(() {
-                            piece.rotateAntiClockwise();
-                            hexEngine!.moveCount++;
-                          });
-                        },
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      AnimatedRotation(
-                        turns: piece.turns / 6.0,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOutCubic,
-                        child: CustomPaint(
-                          size: Size(hexW - 2, hexH - 2),
-                          painter: HexPiecePainter(
-                            mode: _displayMode,
-                            isFlat: _isFlatMode,
-                            pieceTurns: piece.turns,
-                            edgeData: [
-                              hexEngine!.patterns[piece.baseEdges[0]]!,
-                              hexEngine!.patterns[piece.baseEdges[1]]!,
-                              hexEngine!.patterns[piece.baseEdges[2]]!,
-                              hexEngine!.patterns[piece.baseEdges[3]]!,
-                              hexEngine!.patterns[piece.baseEdges[4]]!,
-                              hexEngine!.patterns[piece.baseEdges[5]]!,
-                            ],
-                          ),
-                        ),
-                      ),
-                      CustomPaint(
-                        size: Size(hexW - 2, hexH - 2),
-                        painter: HexOverlayPainter(
-                          mode: _displayMode,
-                          isFlat: _isFlatMode,
-                          edgeData: [
-                            hexEngine!.patterns[piece.getEdge(0)]!,
-                            hexEngine!.patterns[piece.getEdge(1)]!,
-                            hexEngine!.patterns[piece.getEdge(2)]!,
-                            hexEngine!.patterns[piece.getEdge(3)]!,
-                            hexEngine!.patterns[piece.getEdge(4)]!,
-                            hexEngine!.patterns[piece.getEdge(5)]!,
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-
-                return AnimatedPositioned(
-                  key: ValueKey(piece.id),
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  left: left,
-                  top: top,
-                  width: hexW,
-                  height: hexH,
-                  child: DragTarget<int>(
-                    onWillAccept: (src) {
-                      return src != idx;
-                    },
-                    onAccept: (sourceIdx) {
-                      _swapPieces(sourceIdx, idx);
-                    },
-                    builder: (context, candidateData, rejectedData) {
-                      return Draggable<int>(
-                        data: idx,
-                        maxSimultaneousDrags: isSolving ? 0 : 1,
-                        childWhenDragging:
-                            Opacity(opacity: 0.3, child: pieceWidget),
-                        feedback: Material(
-                            color: Colors.transparent,
-                            child: SizedBox(
-                                width: hexW, height: hexH, child: pieceWidget)),
-                        child: pieceWidget,
-                      );
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+          child: needsRotation
+              ? RotatedBox(quarterTurns: qTurns, child: board)
+              : board,
         ),
       );
     } else {

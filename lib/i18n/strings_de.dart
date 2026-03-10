@@ -26,7 +26,7 @@ const Map<String, String> stringsDe = {
   'puzzleSolved': 'Rätsel gelöst!',
   'doNotShowAgain': 'Dies nicht mehr anzeigen',
   'startGame': 'SPIEL STARTEN',
-  'thankYouForCoffee': 'Danke für den Kaffee! ☕️',
+  'thankYouForCoffee': 'Danke für den Kaffee!',
   'purchaseFailed': 'Kauf fehlgeschlagen oder abgebrochen.',
   'buyMeACoffee': 'Kauf mir einen Kaffee?',
   'confirmTip': 'Trinkgeld bestätigen',
@@ -37,4 +37,5 @@ const Map<String, String> stringsDe = {
   'moves': 'Züge',
   'hints': 'Hinweise',
   'gameStateSaved': 'Spielstand gespeichert!',
+  'exitPuzzle': 'Puzzle beenden',
 };

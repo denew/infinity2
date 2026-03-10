@@ -21,7 +21,7 @@ const Map<String, String> stringsJa = {
   'puzzleSolved': 'パズルクリア！',
   'doNotShowAgain': '今後表示しない',
   'startGame': 'ゲームスタート',
-  'thankYouForCoffee': 'コーヒーをありがとう！☕️',
+  'thankYouForCoffee': 'コーヒーをありがとう！',
   'purchaseFailed': '購入が失敗またはキャンセルされました。',
   'buyMeACoffee': 'コーヒーをおごる？',
   'confirmTip': 'チップを確認',
@@ -32,4 +32,5 @@ const Map<String, String> stringsJa = {
   'moves': '手数',
   'hints': 'ヒント',
   'gameStateSaved': 'ゲームの状態が保存されました！',
+  'exitPuzzle': 'パズルを終了する',
 };

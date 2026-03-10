@@ -25,7 +25,7 @@ const Map<String, String> stringsEs = {
   'puzzleSolved': '¡Rompecabezas resuelto!',
   'doNotShowAgain': 'No mostrar esto de nuevo',
   'startGame': 'INICIAR JUEGO',
-  'thankYouForCoffee': '¡Gracias por el café! ☕️',
+  'thankYouForCoffee': '¡Gracias por el café!',
   'purchaseFailed': 'Compra fallida o cancelada.',
   'buyMeACoffee': '¿Me compras un café?',
   'confirmTip': 'Confirmar Propina',
@@ -36,4 +36,5 @@ const Map<String, String> stringsEs = {
   'moves': 'Movimientos',
   'hints': 'Pistas',
   'gameStateSaved': '¡Estado del juego guardado!',
+  'exitPuzzle': 'Salir del rompecabezas',
 };

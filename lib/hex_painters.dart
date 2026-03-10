@@ -165,11 +165,13 @@ class HexOverlayPainter extends CustomPainter {
   final DisplayMode mode;
   final bool isFlat;
   final List<PatternData> edgeData;
+  final int rotationTurns;
 
   HexOverlayPainter({
     required this.mode,
     required this.isFlat,
     required this.edgeData,
+    this.rotationTurns = 0,
   });
 
   @override
@@ -223,8 +225,13 @@ class HexOverlayPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
       );
       tp.layout();
-      tp.paint(canvas,
-          Offset(centroid.dx - tp.width / 2, centroid.dy - tp.height / 2));
+      canvas.save();
+      canvas.translate(centroid.dx, centroid.dy);
+      if (rotationTurns != 0) {
+        canvas.rotate(-rotationTurns * math.pi / 2);
+      }
+      tp.paint(canvas, Offset(-tp.width / 2, -tp.height / 2));
+      canvas.restore();
     }
   }
 

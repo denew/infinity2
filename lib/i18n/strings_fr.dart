@@ -25,7 +25,7 @@ const Map<String, String> stringsFr = {
   'puzzleSolved': 'Casse-tête résolu !',
   'doNotShowAgain': 'Ne plus afficher ce message',
   'startGame': 'COMMENCER',
-  'thankYouForCoffee': 'Merci pour le café ! ☕️',
+  'thankYouForCoffee': 'Merci pour le café !',
   'purchaseFailed': 'Achat échoué ou annulé.',
   'buyMeACoffee': 'M\'offrir un café ?',
   'confirmTip': 'Confirmer le don',
@@ -36,4 +36,5 @@ const Map<String, String> stringsFr = {
   'moves': 'Coups',
   'hints': 'Indices',
   'gameStateSaved': 'État du jeu sauvegardé !',
+  'exitPuzzle': 'Quitter le puzzle',
 };

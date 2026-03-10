@@ -78,6 +78,7 @@ class AppStrings {
   static String get moves => _get('moves');
   static String get hints => _get('hints');
   static String get gameStateSaved => _get('gameStateSaved');
+  static String get exitPuzzle => _get('exitPuzzle');
 
   static String _get(String key) {
     return _localizedStrings[currentLanguageCode]?[key] ??

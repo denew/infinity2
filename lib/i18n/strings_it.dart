@@ -25,7 +25,7 @@ const Map<String, String> stringsIt = {
   'puzzleSolved': 'Puzzle risolto!',
   'doNotShowAgain': 'Non mostrare più',
   'startGame': 'INIZIA GIOCO',
-  'thankYouForCoffee': 'Grazie per il caffè! ☕️',
+  'thankYouForCoffee': 'Grazie per il caffè!',
   'purchaseFailed': 'Acquisto fallito o annullato.',
   'buyMeACoffee': 'Comprami un caffè?',
   'confirmTip': 'Conferma Mancia',
@@ -36,4 +36,5 @@ const Map<String, String> stringsIt = {
   'moves': 'Mosse',
   'hints': 'Suggerimenti',
   'gameStateSaved': 'Stato del gioco salvato!',
+  'exitPuzzle': 'Esci dal puzzle',
 };

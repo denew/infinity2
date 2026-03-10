@@ -22,7 +22,7 @@ const Map<String, String> stringsKo = {
   'puzzleSolved': '퍼즐 완료!',
   'doNotShowAgain': '다시 보지 않기',
   'startGame': '게임 시작',
-  'thankYouForCoffee': '커피 감사합니다! ☕️',
+  'thankYouForCoffee': '커피 감사합니다!',
   'purchaseFailed': '구매 실패 또는 취소되었습니다.',
   'buyMeACoffee': '커피 한 잔 사주시겠어요?',
   'confirmTip': '팁 확인',
@@ -33,4 +33,5 @@ const Map<String, String> stringsKo = {
   'moves': '이동',
   'hints': '힌트',
   'gameStateSaved': '게임 상태가 저장되었습니다!',
+  'exitPuzzle': '퍼즐 종료',
 };
