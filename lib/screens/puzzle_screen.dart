@@ -16,6 +16,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../main.dart'; // For paymentService
 import '../widgets/tip_dialog.dart';
 
+const bool showDebugMenu = bool.fromEnvironment('SHOW_DEBUG_MENU', defaultValue: false);
+
 class PuzzleScreen extends StatefulWidget {
   const PuzzleScreen({Key? key}) : super(key: key);
 
@@ -837,19 +839,20 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       },
                     ),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.lock_open),
-                    title: Text(AppStrings.resetPadlock),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setBool('isUnlocked', false);
-                      setState(() {
-                        _isUnlocked = false;
-                        _sliderValue = 2.0;
-                      });
-                    },
-                  ),
+                  if (showDebugMenu)
+                    ListTile(
+                      leading: const Icon(Icons.lock_open),
+                      title: Text(AppStrings.resetPadlock),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('isUnlocked', false);
+                        setState(() {
+                          _isUnlocked = false;
+                          _sliderValue = 2.0;
+                        });
+                      },
+                    ),
                   ListTile(
                     leading: const Icon(Icons.info_outline),
                     title: Text(AppStrings.help),
